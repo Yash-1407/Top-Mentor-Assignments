@@ -1,0 +1,180 @@
+table Fact_Orders
+
+	measure 'Total Sales' = SUM(Fact_Orders[Sales])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Total Profit' = SUM(Fact_Orders[Profit])
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Profit Margin %' = DIVIDE([Total Profit], [Total Sales], 0)
+		formatString: 0.00%;-0.00%;0.00%
+
+	measure 'Total Quantity' = SUM(Fact_Orders[Quantity])
+		formatString: #,0
+
+	measure 'Avg Discount %' = AVERAGE(Fact_Orders[Discount])
+		formatString: 0.00%;-0.00%;0.00%
+
+	measure 'Total Orders' = DISTINCTCOUNT(Fact_Orders[Order ID])
+		formatString: #,0
+
+	measure 'Total Customers' = DISTINCTCOUNT(Fact_Orders[Customer ID])
+		formatString: #,0
+
+	measure 'Avg Shipping Days' = AVERAGE(Fact_Orders[Shipping Days])
+		formatString: 0.00
+
+	measure 'Returned Orders' = CALCULATE(DISTINCTCOUNT(Fact_Orders[Order ID]), NOT(ISBLANK(RELATED(Dim_Returns[Order ID]))))
+		formatString: #,0
+
+	measure 'Order Return Rate %' = DIVIDE([Returned Orders], [Total Orders], 0)
+		formatString: 0.00%;-0.00%;0.00%
+
+	measure 'Returned Sales $' = CALCULATE([Total Sales], NOT(ISBLANK(RELATED(Dim_Returns[Order ID]))))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Sales PY' = CALCULATE([Total Sales], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Sales YoY %' = DIVIDE([Total Sales] - [Sales PY], [Sales PY], 0)
+		formatString: +0.00%;-0.00%;0.00%
+
+	measure 'Profit PY' = CALCULATE([Total Profit], SAMEPERIODLASTYEAR(Dim_Date[Date]))
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+
+	measure 'Profit YoY %' = DIVIDE([Total Profit] - [Profit PY], [Profit PY], 0)
+		formatString: +0.00%;-0.00%;0.00%
+
+	column 'Row ID'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		sourceColumn: Row ID
+
+	column 'Order ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Order ID
+
+	column 'Order Date'
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: Order Date
+
+	column 'Ship Date'
+		dataType: dateTime
+		formatString: Short Date
+		summarizeBy: none
+		sourceColumn: Ship Date
+
+	column 'Ship Mode'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Ship Mode
+
+	column 'Customer ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer ID
+
+	column 'Customer Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Customer Name
+
+	column Segment
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Segment
+
+	column Country
+		dataType: string
+		dataCategory: Country
+		summarizeBy: none
+		sourceColumn: Country
+
+	column City
+		dataType: string
+		dataCategory: City
+		summarizeBy: none
+		sourceColumn: City
+
+	column State
+		dataType: string
+		dataCategory: StateOrProvince
+		summarizeBy: none
+		sourceColumn: State
+
+	column 'Postal Code'
+		dataType: string
+		dataCategory: PostalCode
+		summarizeBy: none
+		sourceColumn: Postal Code
+
+	column Region
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Region
+
+	column 'Product ID'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product ID
+
+	column Category
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Category
+
+	column 'Sub-Category'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Sub-Category
+
+	column 'Product Name'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Product Name
+
+	column Sales
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: sum
+		sourceColumn: Sales
+
+	column Quantity
+		dataType: int64
+		formatString: #,0
+		summarizeBy: sum
+		sourceColumn: Quantity
+
+	column Discount
+		dataType: double
+		formatString: 0.00%;-0.00%;0.00%
+		summarizeBy: average
+		sourceColumn: Discount
+
+	column Profit
+		dataType: double
+		formatString: \$#,0.00;(\$#,0.00);\$#,0.00
+		summarizeBy: sum
+		sourceColumn: Profit
+
+	column 'Shipping Days'
+		dataType: int64
+		formatString: 0
+		summarizeBy: average
+		sourceColumn: Shipping Days
+
+	partition Fact_Orders = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents(ExcelFilePath), null, true),
+			    Orders_Sheet = Source{[Item="Orders",Kind="Sheet"]}[Data],
+			    PromotedHeaders = Table.PromoteHeaders(Orders_Sheet, [PromoteAllScalars=true]),
+			    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"Row ID", Int64.Type}, {"Order ID", type text}, {"Order Date", type date}, {"Ship Date", type date}, {"Ship Mode", type text}, {"Customer ID", type text}, {"Customer Name", type text}, {"Segment", type text}, {"Country", type text}, {"City", type text}, {"State", type text}, {"Postal Code", type text}, {"Region", type text}, {"Product ID", type text}, {"Category", type text}, {"Sub-Category", type text}, {"Product Name", type text}, {"Sales", type number}, {"Quantity", Int64.Type}, {"Discount", type number}, {"Profit", type number}}),
+			    AddedShippingDays = Table.AddColumn(ChangedType, "Shipping Days", each Duration.Days([Ship Date] - [Order Date]), Int64.Type)
+			in
+			    AddedShippingDays

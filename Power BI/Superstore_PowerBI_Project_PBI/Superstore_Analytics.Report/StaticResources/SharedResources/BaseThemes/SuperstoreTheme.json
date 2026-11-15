@@ -1,0 +1,19 @@
+{
+  "name": "SuperstoreExecutiveSlate",
+  "dataColors": [
+    "#1E3A8A",
+    "#0D9488",
+    "#D97706",
+    "#64748B",
+    "#DC2626",
+    "#2563EB",
+    "#059669",
+    "#7C3AED"
+  ],
+  "background": "#F8FAFC",
+  "foreground": "#0F172A",
+  "tableAccent": "#1E3A8A",
+  "good": "#0D9488",
+  "neutral": "#D97706",
+  "bad": "#DC2626"
+}

@@ -1,0 +1,24 @@
+table Dim_People
+
+	column Region
+		dataType: string
+		isKey
+		summarizeBy: none
+		sourceColumn: Region
+
+	column 'Regional Manager'
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Regional Manager
+
+	partition Dim_People = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents(ExcelFilePath), null, true),
+			    People_Sheet = Source{[Item="People",Kind="Sheet"]}[Data],
+			    PromotedHeaders = Table.PromoteHeaders(People_Sheet, [PromoteAllScalars=true]),
+			    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"Person", type text}, {"Region", type text}}),
+			    RenamedCols = Table.RenameColumns(ChangedType,{{"Person", "Regional Manager"}})
+			in
+			    RenamedCols

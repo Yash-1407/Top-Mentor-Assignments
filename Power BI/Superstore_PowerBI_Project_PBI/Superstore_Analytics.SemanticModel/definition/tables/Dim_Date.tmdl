@@ -1,0 +1,63 @@
+table Dim_Date
+	dataCategory: Time
+
+	column Date
+		dataType: dateTime
+		isKey
+		formatString: Short Date
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+	column Year
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+	column 'Quarter Number'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter Number]
+
+	column Quarter
+		dataType: string
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter]
+
+	column 'Month Number'
+		dataType: int64
+		formatString: 0
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Number]
+
+	column 'Month Name'
+		dataType: string
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Month Name]
+		sortByColumn: 'Month Number'
+
+	column 'Year-Month'
+		dataType: string
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year-Month]
+
+	partition Dim_Date = calculated
+		mode: import
+		source =
+			ADDCOLUMNS(
+			    CALENDAR(DATE(2015, 1, 1), DATE(2018, 12, 31)),
+			    "Year", YEAR([Date]),
+			    "Quarter Number", QUARTER([Date]),
+			    "Quarter", "Q" & QUARTER([Date]),
+			    "Month Number", MONTH([Date]),
+			    "Month Name", FORMAT([Date], "MMMM"),
+			    "Year-Month", FORMAT([Date], "YYYY-MM")
+			)

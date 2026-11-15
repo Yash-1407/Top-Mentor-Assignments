@@ -1,0 +1,49 @@
+{
+  "config": "{\"version\": \"5.53\", \"themeCollection\": {\"baseTheme\": {\"name\": \"SuperstoreTheme\", \"version\": \"5.53\", \"type\": 2}}, \"activeSectionIndex\": 0}",
+  "layoutOptimization": 0,
+  "resourcePackages": [
+    {
+      "resourcePackage": {
+        "disabled": false,
+        "items": [
+          {
+            "name": "SuperstoreTheme",
+            "path": "BaseThemes/SuperstoreTheme.json",
+            "type": 202
+          }
+        ],
+        "name": "SharedResources",
+        "type": 2
+      }
+    }
+  ],
+  "sections": [
+    {
+      "displayName": "1. Executive Overview",
+      "displayOption": 1,
+      "height": 720,
+      "width": 1280,
+      "name": "ReportSectionExecutiveOverview",
+      "ordinal": 0,
+      "visualContainers": []
+    },
+    {
+      "displayName": "2. Product & Discount Diagnostics",
+      "displayOption": 1,
+      "height": 720,
+      "width": 1280,
+      "name": "ReportSectionProductDiagnostics",
+      "ordinal": 1,
+      "visualContainers": []
+    },
+    {
+      "displayName": "3. Regional & Returns Operations",
+      "displayOption": 1,
+      "height": 720,
+      "width": 1280,
+      "name": "ReportSectionRegionalOperations",
+      "ordinal": 2,
+      "visualContainers": []
+    }
+  ]
+}

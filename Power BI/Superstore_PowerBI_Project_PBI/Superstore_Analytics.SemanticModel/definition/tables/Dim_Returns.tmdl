@@ -1,0 +1,24 @@
+table Dim_Returns
+
+	column 'Order ID'
+		dataType: string
+		isKey
+		summarizeBy: none
+		sourceColumn: Order ID
+
+	column Returned
+		dataType: string
+		summarizeBy: none
+		sourceColumn: Returned
+
+	partition Dim_Returns = m
+		mode: import
+		source =
+			let
+			    Source = Excel.Workbook(File.Contents(ExcelFilePath), null, true),
+			    Returns_Sheet = Source{[Item="Returns",Kind="Sheet"]}[Data],
+			    PromotedHeaders = Table.PromoteHeaders(Returns_Sheet, [PromoteAllScalars=true]),
+			    ChangedType = Table.TransformColumnTypes(PromotedHeaders,{{"Returned", type text}, {"Order ID", type text}}),
+			    DistinctOrders = Table.Distinct(ChangedType, {"Order ID"})
+			in
+			    DistinctOrders

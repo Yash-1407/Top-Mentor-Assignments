@@ -1,0 +1,11 @@
+relationship 11111111-1111-1111-1111-111111111101
+	fromColumn: Fact_Orders.'Order ID'
+	toColumn: Dim_Returns.'Order ID'
+
+relationship 11111111-1111-1111-1111-111111111102
+	fromColumn: Fact_Orders.Region
+	toColumn: Dim_People.Region
+
+relationship 11111111-1111-1111-1111-111111111103
+	fromColumn: Fact_Orders.'Order Date'
+	toColumn: Dim_Date.Date
